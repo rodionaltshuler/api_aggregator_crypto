@@ -1,0 +1,9 @@
+exchange_id: "Blockchain.com"
+server:
+  port: 3000
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6380
