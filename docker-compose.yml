@@ -15,6 +15,14 @@ services:
   fetch1:
     container_name: fetch1
     image: cryptoexchange.aggregator.fetch:0.0.1
+#    build:
+#      context: ./fetch
+#      dockerfile: Dockerfile
+
+  #run ver 0.0.2 in parallel
+  fetch2:
+    container_name: fetch2
+    image: cryptoexchange.aggregator.fetch:0.0.2
     build:
       context: ./fetch
       dockerfile: Dockerfile
