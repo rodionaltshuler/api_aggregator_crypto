@@ -1,12 +1,14 @@
 #[macro_use]
 extern crate lazy_static;
+use std::time::Duration;
 use actix_web::App;
 use actix_web::get;
 use actix_web::HttpResponse;
 use actix_web::HttpServer;
 use actix_web::web;
 use actix_web::http::header::ContentType;
-use crate::cache::CACHE;
+use clokwerk::Interval;
+use crate::cache::{CACHE, CacheUpdater};
 
 mod repository;
 mod cache;
@@ -14,12 +16,21 @@ mod cache;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    let mut cache_updater = CacheUpdater::new();
+
+    cache_updater.
+        update_cache_now().
+        schedule_cache_updates(Interval::Seconds(5));
+
+    let handle = cache_updater.scheduler.watch_thread(Duration::from_millis(100));
+
     HttpServer::new(|| {
         App::new()
             .service(order_books)
     })
 
-        .bind(("127.0.0.1", 8081))?
+        .bind(("127.0.0.1", 8080))?
         .run()
         .await
 }
@@ -27,7 +38,6 @@ async fn main() -> std::io::Result<()> {
 
 #[get("/exchanges/{exchange}/order-books/")]
 async fn order_books(exchange: web::Path<(String)>) -> HttpResponse {
-
     let exchange = &exchange.into_inner();
 
     let cache_read_lock = CACHE.read().unwrap();
@@ -38,7 +48,8 @@ async fn order_books(exchange: web::Path<(String)>) -> HttpResponse {
             let body = serde_json::to_string(&b).unwrap();
             HttpResponse::Ok()
                 .content_type(ContentType::json())
-                .body(body) },
+                .body(body)
+        }
         None => {
             let error_message = format!("Data for exchange {} not found", String::from(exchange));
             HttpResponse::NotFound()
