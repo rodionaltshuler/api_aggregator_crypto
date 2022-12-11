@@ -11,7 +11,7 @@ lazy_static! {
 
 pub trait Repository<VALUE, KEY> {
     fn save(&mut self, key: &KEY, record: &VALUE) -> VALUE;
-    fn find_all(&mut self) -> Vec<VALUE>;
+    fn find_all(&mut self) -> Option<Vec<VALUE>>;
     fn find(&mut self, key: &KEY) -> Option<VALUE>;
     fn delete_all(&mut self);
 }
@@ -33,14 +33,15 @@ impl RedisRepository {
 impl Repository<OrderBook, String> for RedisRepository {
 
     fn save(&mut self, key: &String, record: &OrderBook) -> OrderBook {
-        //TODO implement
+        //TODO implement - required for tests only
         OrderBook { exchange: record.exchange.clone(),  markets: String::from("[]") }
     }
 
-    fn find_all(&mut self) -> Vec<OrderBook> {
-        //TODO implement
-
-        vec![self.find(&String::from("Blockchain.com")).unwrap()]
+    fn find_all(&mut self) -> Option<Vec<OrderBook>> {
+        let collection_name = format!("OrderBookString");
+        let exchanges : RedisResult<Vec<String>> = self.connection.smembers(collection_name);
+        let exchanges = exchanges.unwrap();
+        exchanges.iter().map(|exchange| self.find(&exchange)).collect()
     }
 
     fn find(&mut self, key: &String) -> Option<OrderBook> {
@@ -58,7 +59,7 @@ impl Repository<OrderBook, String> for RedisRepository {
     }
 
     fn delete_all(&mut self) {
-        //TODO implement
+        //TODO implement - required for tests only
     }
 }
 
