@@ -8,6 +8,7 @@ use actix_web::HttpServer;
 use actix_web::web;
 use actix_web::http::header::ContentType;
 use clokwerk::Interval;
+use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use crate::cache::{CACHE, CacheUpdater};
 
 mod repository;
@@ -25,17 +26,30 @@ async fn main() -> std::io::Result<()> {
 
     let handle = cache_updater.scheduler.watch_thread(Duration::from_millis(100));
 
+    let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+    builder
+        .set_private_key_file("cert/backend_dev.key", SslFiletype::PEM)
+        .unwrap();
+    builder.set_certificate_chain_file("cert/backend_dev.crt").unwrap();
+
+
     HttpServer::new(|| {
         App::new()
             .service(order_books)
+            .service(hello)
     })
-
-        .bind(("127.0.0.1", 8080))?
+        .bind_openssl("127.0.0.1:8080", builder)?
         .run()
         .await
 }
 
 
+#[get("/hello/")]
+async fn hello() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body("Hello")
+}
 #[get("/exchanges/{exchange}/order-books/")]
 async fn order_books(exchange: web::Path<(String)>) -> HttpResponse {
     let exchange = &exchange.into_inner();
