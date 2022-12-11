@@ -52,7 +52,7 @@ impl CacheUpdater {
 
     pub fn update_cache() {
         println!("Updating cache");
-        let exchanges = REPOSITORY.write().unwrap().find_all();
+        let exchanges = REPOSITORY.write().unwrap().find_all().unwrap();
         println!("Got {} exchanges data from repo", exchanges.len());
         exchanges.into_iter().for_each(|b| CACHE.write().unwrap().put(b));
 
