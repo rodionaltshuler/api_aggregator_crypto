@@ -5,6 +5,7 @@
 2. Provide aggregated data via REST API
 
 ### Pre-requisites:
+* openssl to generate TLS certificates or existing certificate and private key
 * Docker
 
 ### Architecture
@@ -16,17 +17,23 @@ C4-style, container level diagram.
 
 ### Usage
 
+generate TLS certificates
+
+```
+openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout api/cert/server.key -out api/cert/server.crt
+```
+
 start everything:
 
 `docker-compose up -d --build`
 
 API interactive documentation:
 
-`http://localhost:8080/swagger-ui/index.html`
+`https://localhost:443/swagger-ui/index.html`
 
 OpenAPI spec:
 
-`http://localhost:8080/v3/api-docs`
+`https://localhost:443/v3/api-docs`
 
 
 ### Quality attributes (non-functional requirements)
