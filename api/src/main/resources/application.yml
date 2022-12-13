@@ -1,3 +1,13 @@
+server:
+  port: 443
+  ssl:
+    enabled: true
+    certificate: "cert/server.crt"
+    certificate-private-key: "cert/server.key"
+
+  http2:
+    enabled: true
+
 spring:
   data:
     redis:

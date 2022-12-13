@@ -9,18 +9,21 @@ Motivation for this design: Redis load from single api instance is constant rega
 
 ### Configuration
 
-1. Single fetch services implementation supposed to be used for specific Crypto exchange,
-   implementing ExchangeFetchService according to particular exchange API.
-
-2. Exchange ID we use in our system to identify exchanges is configured in `application.yml`.
-
-3. `com.aggregator.api.cache.CacheUpdateScheduler` class is responsible for scheduling local cache update, currently if you want to change frequency - configure it there. 
+1. `com.aggregator.api.cache.CacheUpdateScheduler` class is responsible for scheduling local cache update, currently if you want to change frequency - configure it there. 
   Please note updating more often than request frequency to exchanges by `fetch` might not have sense. 
 
 
 ### Usage
 
-Service is started together with other ones with `docker-compose up -d --build` from the root of the project, see README.md in root for details.
+1. Generate TLS certificate:
+
+```
+openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout cert/server.key -out cert/server.crt
+```
+
+2. Place `server.crt` and `server.key` files generated in step #1 to api/cert folder. Name and location of certificates are customizable with settings in `application.yml`. 
+
+3. Service is started together with other ones with `docker-compose up -d --build` from the root of the project, see README.md in root for details.
 
 ### Development
 
