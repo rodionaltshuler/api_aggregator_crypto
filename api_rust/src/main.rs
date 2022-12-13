@@ -28,9 +28,9 @@ async fn main() -> std::io::Result<()> {
 
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
     builder
-        .set_private_key_file("cert/backend_dev.key", SslFiletype::PEM)
+        .set_private_key_file("cert/server.key", SslFiletype::PEM)
         .unwrap();
-    builder.set_certificate_chain_file("cert/backend_dev.crt").unwrap();
+    builder.set_certificate_chain_file("cert/server.crt").unwrap();
 
 
     HttpServer::new(|| {
@@ -59,10 +59,9 @@ async fn order_books(exchange: web::Path<(String)>) -> HttpResponse {
 
     match cache_result {
         Some(b) => {
-            let body = serde_json::to_string(&b).unwrap();
             HttpResponse::Ok()
                 .content_type(ContentType::json())
-                .body(body)
+                .json(b)
         }
         None => {
             let error_message = format!("Data for exchange {} not found", String::from(exchange));
