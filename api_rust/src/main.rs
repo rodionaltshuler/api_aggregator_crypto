@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
+
+use std::env;
 use std::time::Duration;
 use actix_web::App;
 use actix_web::get;
@@ -32,13 +34,16 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
     builder.set_certificate_chain_file("cert/server.crt").unwrap();
 
+    let host = env::var("SERVER_HOST").unwrap_or(String::from("127.0.0.1"));
+    let port = env::var("SERVER_PORT").unwrap_or(String::from("8080"));
 
     HttpServer::new(|| {
         App::new()
             .service(order_books)
             .service(hello)
     })
-        .bind_openssl("127.0.0.1:8080", builder)?
+        //.bind((host, 8080))? -> no-tls version
+        .bind_openssl(String::from(format!("{host}:{port}")), builder)?
         .run()
         .await
 }
