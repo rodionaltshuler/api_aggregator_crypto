@@ -15,11 +15,7 @@ services:
   fetch1:
     container_name: fetch1
     image: cryptoexchange.aggregator.fetch:0.0.1
-#    build:
-#      context: ./fetch
-#      dockerfile: Dockerfile
 
-  #run ver 0.0.2 in parallel
   fetch2:
     container_name: fetch2
     image: cryptoexchange.aggregator.fetch:0.0.2
@@ -33,5 +29,21 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
+    volumes:
+      - ./api/cert:/usr/app/cert
     ports:
-      - "8080:8080"
+      - "443:443"
+
+  api2:
+    container_name: api-rust
+    image: cryptoexchange.aggregator.api-rust:0.0.1
+    build:
+      context: ./api_rust
+      dockerfile: Dockerfile
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
+    volumes:
+      - ./api_rust/cert:/cert
+    ports:
+      - "8081:8080"

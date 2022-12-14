@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::env;
 use redis::Commands;
 use redis::RedisResult;
 use serde::{Deserialize, Serialize};
@@ -22,7 +23,10 @@ pub struct RedisRepository {
 
 impl RedisRepository {
     pub fn new() -> RedisRepository {
-        let client = redis::Client::open("redis://localhost:6380/").unwrap();
+        let redis_host = env::var("REDIS_HOST").unwrap_or(String::from("localhost"));
+        let redis_port = env::var("REDIS_PORT").unwrap_or(String::from("6380"));
+        let redis_connection_string = format!("redis://{redis_host}:{redis_port}/");
+        let client = redis::Client::open(redis_connection_string).unwrap();
         let connection = client.get_connection().unwrap();
         RedisRepository { connection }
     }
