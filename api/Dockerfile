@@ -5,6 +5,7 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
+COPY cert cert
 
 RUN ./mvnw clean install
 
