@@ -49,13 +49,13 @@ async fn main() -> std::io::Result<()> {
 }
 
 
-#[get("/hello/")]
+#[get("/hello")]
 async fn hello() -> HttpResponse {
     HttpResponse::Ok()
         .content_type(ContentType::plaintext())
         .body("Hello")
 }
-#[get("/exchanges/{exchange}/order-books/")]
+#[get("/exchanges/{exchange}/order-books")]
 async fn order_books(exchange: web::Path<(String)>) -> HttpResponse {
     let exchange = &exchange.into_inner();
 
