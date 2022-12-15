@@ -1,8 +1,6 @@
 package com.aggregator.api
 
 import com.aggregator.api.cache.OrderBookDtoCache
-import com.aggregator.store.OrderBookDto
-import com.aggregator.store.OrderBookDto.MarketDto
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,9 +27,9 @@ class OrderBookControllerTest(@Autowired val mockMvc: MockMvc) {
         fun cache() : OrderBookDtoCache {
             val cache = OrderBookDtoCache()
             val exchange = "test-exchange"
-            val sampleOrderBook = OrderBookDto(exchange, listOf(
-                    MarketDto(1234567890, "BTC-USD", 0.1, 100.0, 0.11, 200.0)))
-            cache.orderBooksByExchange[exchange] = sampleOrderBook
+            val markets = listOf(
+                    MarketDto(1234567890, "BTC-USD", 0.1, 100.0, 0.11, 200.0))
+            cache.orderBooksByExchange[exchange] = OrderBookDto(exchange, markets)
             println("Cache initialized")
             return cache
         }
