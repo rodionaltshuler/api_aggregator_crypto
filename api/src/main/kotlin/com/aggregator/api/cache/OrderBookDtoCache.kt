@@ -1,7 +1,9 @@
 package com.aggregator.api.cache
 
-import com.aggregator.store.OrderBookDto
+import com.aggregator.api.OrderBookDto
 import com.aggregator.store.OrderBookDtoRepository
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.annotation.PostConstruct
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
@@ -16,7 +18,8 @@ data class OrderBookDtoCache(
 @Component
 @Profile("!test")
 class CacheUpdateScheduler(private val repository: OrderBookDtoRepository,
-        private val cache: OrderBookDtoCache){
+        private val cache: OrderBookDtoCache,
+        private val objectMapper: ObjectMapper){
 
     @PostConstruct
     fun awaitForCacheFill(){
@@ -25,7 +28,9 @@ class CacheUpdateScheduler(private val repository: OrderBookDtoRepository,
 
     @Scheduled(fixedDelay = 5, timeUnit = TimeUnit.SECONDS)
     fun update() {
-        repository.findAll().forEach { cache.orderBooksByExchange[it.exchangeId] = it }
+        repository.findAll()
+                .map { entry -> OrderBookDto(entry.exchangeId, objectMapper.readValue(entry.markets) ) }
+                .forEach { cache.orderBooksByExchange[it.exchangeId] = it }
         //TODO service health flag to healthy
     }
 }

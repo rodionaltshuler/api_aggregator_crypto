@@ -1,8 +1,7 @@
 package com.aggregator.api
 
 import com.aggregator.api.cache.OrderBookDtoCache
-import com.aggregator.store.OrderBookDto
-import com.aggregator.store.OrderBookDto.MarketDto
+import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,7 +20,8 @@ class OrderBookController(val cache: OrderBookDtoCache) {
         val book = cache.orderBooksByExchange[exchangeName]
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Order book not found for exchange $exchangeName")
 
-        var markets = book.markets;
+        var markets = book.markets
+        //var markets = objectMapper.readValue<List<MarketDto>>(book.markets);
 
         marketParam?.let {
             markets = markets.filter { it.market == marketParam }
@@ -40,3 +40,8 @@ class OrderBookController(val cache: OrderBookDtoCache) {
     }
 
 }
+
+data class OrderBookDto(val exchangeId: String, val markets: List<MarketDto>)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class MarketDto(val timestamp: Long, val market: String, val avgBid: Double?, val qtyBid: Double?, val avgAsk: Double?, val qtyAsk: Double?)

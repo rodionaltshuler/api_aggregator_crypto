@@ -13,7 +13,7 @@ FROM openjdk:19-ea-jdk-slim-bullseye
 WORKDIR usr/app
 VOLUME /tmp
 ENV TARGET_FOLDER=/workspace/app/target
-ENV JAR_FILE=api-0.0.1-SNAPSHOT.jar
+ENV JAR_FILE=api-0.2.0.jar
 COPY --from=build ${TARGET_FOLDER}/${JAR_FILE} /usr/app
 
 ENTRYPOINT java -Dspring.profiles.active=docker -jar ${JAR_FILE}

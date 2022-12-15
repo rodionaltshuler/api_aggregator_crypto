@@ -12,10 +12,6 @@ services:
       - ./redis-data:/data
     entrypoint: redis-server --appendonly yes
 
-  fetch1:
-    container_name: fetch1
-    image: cryptoexchange.aggregator.fetch:0.0.1
-
   fetch2:
     container_name: fetch2
     image: cryptoexchange.aggregator.fetch:0.0.2
@@ -23,9 +19,9 @@ services:
       context: ./fetch
       dockerfile: Dockerfile
 
-  api1:
-    container_name: api1
-    image: cryptoexchange.aggregator.api:0.0.1
+  api2:
+    container_name: api2
+    image: cryptoexchange.aggregator.api:0.2.0
     build:
       context: ./api
       dockerfile: Dockerfile
@@ -34,7 +30,7 @@ services:
     ports:
       - "443:443"
 
-  api2:
+  api2-rust:
     container_name: api-rust
     image: cryptoexchange.aggregator.api-rust:0.0.1
     build:
